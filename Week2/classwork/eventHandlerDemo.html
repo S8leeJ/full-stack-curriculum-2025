@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Event Handling Examples</title>
+    <style>
+      /* Style for the creative example */
+      .creative-div {
+        width: 200px;
+        height: 200px;
+        background-color: lightblue;
+        margin: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Event Handling Examples</h1>
+
+    <!-- Example #1: Button Click Event -->
+    <button class="button">Click me!</button>
+
+    <script>
+      // Example #1: Button Click Event
+      let buttonElement = document.querySelector(".button");
+      buttonElement.addEventListener("click", clickButtonDemo);
+
+      // buttonElement.addEventListener("click", console.log("Button clicked!"));
+
+      // Here, console.log("Button clicked!") is immediately executed
+      // when the script runs because the parentheses () cause the function
+      // to run right away. This means the message "Button clicked!" is
+      // logged immediately when the page loads, not when the button is clicked.
+
+      // Additionally, since addEventListener expects a function reference,
+      // you are effectively passing the result of console.log() (which is undefined)
+      // to the event listener, so nothing happens when the button is actually clicked.
+
+      function clickButtonDemo() {
+        console.log("Button clicked!");
+      }
+    </script>
+
+    <!-- Example #2: Input Keyup Event -->
+    <input type="text" placeholder="Type something" />
+    <p id="input-output">Value typed:</p>
+
+    <script>
+      // Example #2: Input Keyup Event
+      let inputElement = document.querySelector("input");
+      inputElement.addEventListener("keyup", captureInput);
+
+      /* The e (short for "event") is the event object that is automatically 
+        passed to the captureInput function by the browser when the event occurs 
+        (in this case, the "keyup" event). Inside this event object, e.target refers 
+        to the element that triggered the event (in this case, the input field), 
+        and e.target.value is the current value of that input field.
+
+        You are passing the reference to the function captureInput to addEventListener. 
+        The browser will automatically call this function when the event occurs and will 
+        pass the event object (the e) as an argument to the function. There's no need to 
+        explicitly include e in the call to addEventListener, because it automatically 
+        knows to pass the event object to your function.
+
+        If you try inputElement.addEventListener("keyup", captureInput(e));
+
+        This would result in an immediate execution of the captureInput function 
+        when the script is run, similar to the earlier example with console.log("Button clicked!"). 
+        In this case, you'd get an error because e hasn't been defined at the point 
+        where the function is called. The event listener wouldn't work as expected.*/
+
+      function captureInput(e) {
+        console.log("The text in input field is " + e.target.value);
+        document.getElementById("input-output").textContent =
+          "Value typed: " + e.target.value;
+      }
+    </script>
+
+    <!-- Example #3: Mouse Enter Event -->
+    <div class="creative-div">Hover me!</div>
+
+    <script>
+      // Example #3: Mouse Enter Event
+      let creativeDivElement = document.querySelector(".creative-div");
+      creativeDivElement.addEventListener("mouseenter", changeSomething);
+
+      function changeSomething() {
+        const colors = ["red", "green", "blue", "orange", "purple"];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        creativeDivElement.style.backgroundColor = randomColor;
+      }
+    </script>
+
+    <!-- <script>
+        // Example #3: Mouse Enter Event
+        let creativeDivElement = document.querySelector('.creative-div');
+        let lastColor = "";  // Variable to store the last color
+
+        creativeDivElement.addEventListener("mouseenter", changeSomething);
+
+        function changeSomething() {
+            const colors = ["red", "green", "blue", "orange", "purple"];
+            let randomColor;
+
+            do {
+                randomColor = colors[Math.floor(Math.random() * colors.length)];
+            } while (randomColor === lastColor);  // Keep picking a new color until it's different
+
+            creativeDivElement.style.backgroundColor = randomColor;
+            lastColor = randomColor;  // Store the new color as the last selected color
+        }
+    </script> -->
+  </body>
+</html>
