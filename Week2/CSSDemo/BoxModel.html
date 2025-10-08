@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Box Model Visualizer</title>
+
+    <!-- Internal CSS to style the layout and visual elements of the demo -->
+    <style>
+      /* General page setup: font, padding, and background */
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      /* Center the heading and add spacing below */
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      /* Layout of control panel using Flexbox, with wrapping support and spacing between inputs */
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 40px;
+      }
+
+      /* Each control is a vertical stack of label and select */
+      .control {
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Labels styled for readability */
+      label {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      /* Dropdown input style */
+      select {
+        padding: 5px;
+        font-size: 16px;
+      }
+
+      /* Container to center the visual box in the page */
+      .visualizer-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* The box that visually shows the effects of margin, padding, and border */
+      .box {
+        width: 200px;
+        height: 200px;
+        background-color: lightblue;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: black;
+        background-clip: content-box; /* Ensures the background color does not extend into the padding area */
+      }
+
+      /* Footer explanation text styling */
+      footer {
+        text-align: center;
+        margin: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Box Model Visualizer</h1>
+
+    <!-- Interactive controls for modifying box model properties -->
+    <div class="controls">
+      <!-- Margin dropdown -->
+      <div class="control">
+        <label for="margin">Margin</label>
+        <select id="margin">
+          <option value="0px">0px</option>
+          <option value="10px">10px</option>
+          <option value="20px" selected>20px</option>
+          <option value="40px">40px</option>
+          <option value="0%">0%</option>
+          <option value="5%">5%</option>
+          <option value="10%">10%</option>
+        </select>
+      </div>
+
+      <!-- Padding dropdown -->
+      <div class="control">
+        <label for="padding">Padding</label>
+        <select id="padding">
+          <option value="0px">0px</option>
+          <option value="10px">10px</option>
+          <option value="20px" selected>20px</option>
+          <option value="40px">40px</option>
+          <option value="0%">0%</option>
+          <option value="5%">5%</option>
+          <option value="10%">10%</option>
+        </select>
+      </div>
+
+      <!-- Border dropdown -->
+      <div class="control">
+        <label for="border">Border</label>
+        <select id="border">
+          <option value="0px solid transparent">None</option>
+          <option value="2px solid black">2px Solid Black</option>
+          <option value="5px solid orange" selected>5px Solid Orange</option>
+          <option value="10px solid red">10px Solid Red</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- The area where the styled box is rendered -->
+    <div class="visualizer-container">
+      <div class="box" id="box">Inspect Me!</div>
+    </div>
+
+    <!-- Footer describing the box model concepts -->
+    <footer>
+      <p>
+        Margin: The space outside the border that separates the element from
+        others.
+      </p>
+      <p>
+        Padding: The space inside the border between the content and the border.
+      </p>
+      <p>
+        Border: The edge surrounding the padding and content of the element.
+      </p>
+    </footer>
+
+    <!-- JavaScript that handles dynamic style changes based on user selection -->
+    <script>
+      // Get references to the dropdowns and the visual box
+      const marginSelect = document.getElementById("margin");
+      const paddingSelect = document.getElementById("padding");
+      const borderSelect = document.getElementById("border");
+      const box = document.getElementById("box");
+
+      // Updates the box styling based on selected values
+      function updateBoxStyle() {
+        box.style.margin = marginSelect.value;
+        box.style.padding = paddingSelect.value;
+        box.style.border = borderSelect.value;
+      }
+
+      // Attach change listeners to each dropdown so the box updates interactively
+      marginSelect.addEventListener("change", updateBoxStyle);
+      paddingSelect.addEventListener("change", updateBoxStyle);
+      borderSelect.addEventListener("change", updateBoxStyle);
+
+      // Apply the initial selected values to the box
+      updateBoxStyle();
+    </script>
+  </body>
+</html>
