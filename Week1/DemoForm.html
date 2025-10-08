@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTML Demo Form</title>
+  </head>
+
+  <body>
+    <!-- hr, br, and input are all self-closing tags that don't require closing counterparts -->
+    <h1>Create Your Account</h1>
+    <hr />
+
+    <!-- Input for the name -->
+    <!-- The 'name' attribute is required to include this input's data in a form submission.
+         It acts as the key for the corresponding value input by the user. -->
+    <div>
+      <span>Name: </span>
+      <input name="name" />
+    </div>
+    <br />
+
+    <!-- Input for the username -->
+    <!-- Like the name input, the username input also includes a name attribute so it can be submitted -->
+    <div>
+      <span>Username: </span>
+      <input name="username" />
+    </div>
+    <br />
+
+    <!-- Input for the password -->
+    <!-- This input should ideally use type="password" to obscure the characters -->
+    <div>
+      <span>Password: </span>
+      <input name="password" type="password" />
+    </div>
+    <br />
+
+    <!-- Radio buttons for gender selection -->
+    <!-- All radio buttons for the same category must have the same name to ensure only one can be selected -->
+    <div>
+      <span>Gender: </span>
+      <input type="radio" name="gender" value="male" id="male" />
+      <label for="male">Male</label>
+
+      <input type="radio" name="gender" value="female" id="female" />
+      <label for="female">Female</label>
+
+      <input type="radio" name="gender" value="other" id="other" />
+      <label for="other">Other</label>
+    </div>
+    <br />
+
+    <!-- Input for date of birth -->
+    <div>
+      <span>Birthday: </span>
+      <input type="date" name="birthday" />
+    </div>
+    <br />
+
+    <!-- Dropdown select for school year -->
+    <div>
+      <label for="year">Year:</label>
+      <select id="year" name="year">
+        <option value="freshman">Freshman</option>
+        <option value="sophomore">Sophomore</option>
+        <option value="junior">Junior</option>
+        <option value="senior">Senior</option>
+      </select>
+    </div>
+    <br />
+
+    <!-- Input for selecting a color -->
+    <!-- This renders a color picker in the browser -->
+    <div>
+      <label for="colorPicker">Color:</label>
+      <input type="color" name="color" id="colorPicker" />
+    </div>
+    <br />
+
+    <!-- Input for user comments -->
+    <div>
+      <label for="comments">Comments: </label>
+      <input type="text" id="comments" name="comments" />
+    </div>
+    <br />
+
+    <!-- Submit button -->
+    <button type="submit">Submit</button>
+  </body>
+</html>
