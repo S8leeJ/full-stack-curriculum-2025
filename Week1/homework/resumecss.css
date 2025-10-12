@@ -1,0 +1,63 @@
+* {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    background-color: ;
+}
+
+.title {
+    text-align: center;
+
+}
+
+.pfp {
+    display: flex;
+    justify-content: center;
+    padding: 2%;
+}
+
+h1 {
+    text-transform: uppercase;
+    padding: 3%;
+    background-color: aliceblue;
+}
+.links{
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+}
+h2 {
+    text-transform: uppercase;
+
+}
+
+.pfp .img {
+    width: 150px;
+    height: 150px;
+    border-radius: 90%;
+}
+
+.contact {
+    display: flex;
+    justify-content: center;
+    
+    gap: 2%;
+}
+
+.sections {
+    background-color: aliceblue;
+    padding: 2%;
+}
+
+.sections .body {
+    background-color: rgb(205, 219, 235);
+    display: flex;
+    border-radius: 30px;
+    font-size: large;
+}
+
+.skillsTools {
+    background-color: aliceblue;
+}
+
+.orgs {
+    background-color: aliceblue;
+}

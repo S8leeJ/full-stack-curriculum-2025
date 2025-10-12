@@ -1,0 +1,46 @@
+* {
+    background-color: rgb(79, 151, 214);
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0%;
+}
+
+h1 {
+    color: aqua;
+    font-size: 90px;
+    text-align: center;
+    margin-top: 20px;
+
+}
+
+input {
+    padding-left: 10%;
+    border-radius: 5px;
+}
+
+#basic-inputs {
+    margin-top: 10%;
+    margin-left: 10%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2%;
+}
+
+.gender-option {
+    margin-left: 10%;
+}
+
+button {
+    margin-top: 0%;
+    border-radius: 5px;
+    padding: 2% 2% 1% 1%;
+    text-transform: uppercase;
+    font-weight: bord;
+    box-shadow: 4px 4px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+}
+
+button:hover {
+    background-color: blue;
+}
