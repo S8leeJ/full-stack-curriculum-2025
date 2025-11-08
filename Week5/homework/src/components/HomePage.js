@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -10,23 +10,16 @@ import {
   Checkbox,
   Box,
   Grid,
+  IconButton,
 } from "@mui/material";
 import Header from "./Header";
-import { useNavigate } from 'react-router-dom';
 //import { useAuth } from '../contexts/AuthContext';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function HomePage() {
-  const navigate = useNavigate();
 
   // State to hold the list of tasks.
-  const [taskList, setTaskList] = useState([
-    // Sample tasks to start with.
-    { name: "create a todo app", finished: false },
-    { name: "wear a mask", finished: false },
-    { name: "play roblox", finished: false },
-    { name: "be a winner", finished: true },
-    { name: "become a tech bro", finished: true },
-  ]);
+  const [taskList, setTaskList] = useState([]);
 
   // State for the task name being entered by the user.
   const [newTaskName, setNewTaskName] = useState("");
@@ -37,39 +30,76 @@ export default function HomePage() {
 
   function handleAddTask() {
     // Check if task name is provided and if it doesn't already exist.
-    if (newTaskName && !taskList.some((task) => task.name === newTaskName)) {
-
-      // TODO: Support adding todo items to your todo list through the API.
-      // In addition to updating the state directly, you should send a request
-      // to the API to add a new task and then update the state based on the response.
-
-      setTaskList([...taskList, { name: newTaskName, finished: false }]);
-      setNewTaskName("");
-    } else if (taskList.some((task) => task.name === newTaskName)) {
+    if (!newTaskName || !newTaskName.trim()) return;
+    if (taskList.some((task) => task.name === newTaskName)) {
       alert("Task already exists!");
+      return;
     }
+
+    const newTask = {
+      id: `${Date.now()}-${Math.round(Math.random()*10000)}`,
+      name: newTaskName,
+      finished: false,
+    };
+
+    // add new task
+    setTaskList((prev) => [...prev, newTask]);
+    setNewTaskName("");
   }
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
-    setTaskList(
-      taskList.map((t) =>
-        t.id === task.id ? { ...t, finished: !task.finished } : t
-      )
-    );
+    console.log("Toggling task:", task);
+    setTaskList((prev) => prev.map((t) => (t.id === task.id ? { ...t, finished: !t.finished } : t)));
 
     // TODO: Support removing/checking off todo items in your todo list through the API.
     // Similar to adding tasks, when checking off a task, you should send a request
     // to the API to update the task's status and then update the state based on the response.
   }
 
-  // Function to compute a message indicating how many tasks are unfinished.
+  function deleteTask(id) {
+    setTaskList((prev) => prev.filter((t) => t.id !== id));
+  }
+
+   // Function to compute a message indicating how many tasks are unfinished.
   function getUnfinishedTaskMessage() {
     const unfinishedTasks = taskList.filter((task) => !task.finished).length;
     return unfinishedTasks === 1
       ? `You have 1 unfinished task`
       : `You have ${unfinishedTasks} tasks left to do`;
   }
+
+  // Persist tasks to localStorage
+  useEffect(() => {
+    // Load on mount
+    const saved = localStorage.getItem("todo_tasks_v1");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setTaskList(parsed);
+      } catch (e) {
+        console.warn("Failed to parse saved tasks", e);
+      }
+    } else {
+      // initialize with some sample tasks if none saved
+      const samples = [
+        { id: `s-1`, name: "create a todo app", finished: false },
+        { id: `s-2`, name: "wear a mask", finished: false },
+        { id: `s-3`, name: "play roblox", finished: false },
+        { id: `s-4`, name: "be a winner", finished: true },
+        { id: `s-5`, name: "become a tech bro", finished: true },
+      ];
+      setTaskList(samples);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("todo_tasks_v1", JSON.stringify(taskList));
+    } catch (e) {
+      console.warn("Failed to save tasks", e);
+    }
+  }, [taskList]);
 
   return (
     <>
@@ -113,6 +143,7 @@ export default function HomePage() {
                   value={newTaskName}
                   placeholder="Type your task here"
                   onChange={(event) => setNewTaskName(event.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleAddTask(); }}
                 />
               </Grid>
               <Grid item xs={2}>
@@ -130,14 +161,30 @@ export default function HomePage() {
             <List sx={{ marginTop: 3 }}>
               {taskList.map((task) => (
                 <ListItem
-                  key={task.name}
+                  key={task.id}
                   dense
                   onClick={() => toggleTaskCompletion(task)}
                 >
                   <Checkbox
                     checked={task.finished}
+                    onChange={(e) => { e.stopPropagation(); toggleTaskCompletion(task); }}
+                    onClick={(e) => e.stopPropagation()} /* prevent ListItem click from also firing */
                   />
-                  <ListItemText primary={task.name} />
+                  <ListItemText
+                    primary={
+                      <span
+                        style={{
+                          textDecoration: task.finished ? "line-through" : "none",
+                          color: task.finished ? "rgba(0,0,0,0.5)" : "inherit",
+                        }}
+                      >
+                        {task.name}
+                      </span>
+                    }
+                  />
+                  <IconButton edge="end" aria-label="delete" onClick={(e) => { e.stopPropagation(); deleteTask(task.id); }}>
+                    <DeleteIcon />
+                  </IconButton>
                 </ListItem>
               ))}
             </List>
