@@ -95,7 +95,12 @@ function SideContainer(props) {
       lat: lat,
       lon: lon,
     };
-    console.log(city);
+    // inform parent (App) about the selected city so it can be passed to MainContainer
+    if (props.setSelectedCity) {
+      props.setSelectedCity(city);
+    } else {
+      console.log("setSelectedCity not provided in props. Selected city:", city);
+    }
   }
 
   return (

@@ -19,7 +19,7 @@ function Header() {
     >
       <Toolbar>
         <Typography variant="h4" sx={{ flexGrow: 1 }} fontWeight='bold'>
-          {`Name's To-Do List`}
+          {`Jenna's To-Do List`}
         </Typography>
         <Button
           // onClick={logout}

@@ -1,5 +1,17 @@
-/* Add your styling for MainContainer component here */
-/* For example: */
+* {
+  padding: 0px;
+  margin: 0px;
+}
+
+img,
+.hidden {
+  display: none;
+}
+
+img[src] {
+  display: block;
+}
+
 #main-container {
   height: 100%;
   width: 66%;
@@ -7,10 +19,89 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #87b7ff;
+   background: #87b7ff;
+  background: linear-gradient(180deg, #a8d0ff 0%, #5695f3 60%, #2b6ed1 100%);
 }
 
 #weather-container {
-  height: 60%;
   width: 90%;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 }
+
+#five-day-forecast {
+  color: black;
+  display: flex;
+  flex-wrap: wrap;            /* allow cards to wrap to the next row */
+  justify-content: space-evenly;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  
+}
+
+.forecast-day {
+  flex: 1 1 160px;            /* allow shrinking, grow, and prefer ~160px width */
+  min-width: 0;               /* allow content to shrink below its intrinsic size */
+  text-align: center;
+  background-color: #1d64cf89;
+  border-radius: 8px;
+  padding: 12px;
+  box-sizing: border-box;
+  
+}
+
+ 
+.forecast-day-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+.forecast-day-temps {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.forecast-day-desc {
+  color: #06111c;
+  font-size: 0.75rem;
+}
+
+/* Today's weather styles */
+#today-weather {
+  width: 100%;
+  background:  #5695f3;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-top: 3%;
+}
+
+.today-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.today-icon {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 64px;
+}
+
+.today-temp {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 4px 0;
+}
+
+.today-desc {
+  color: #33475b;
+}
+
+
