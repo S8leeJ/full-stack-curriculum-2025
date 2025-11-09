@@ -1,75 +1,108 @@
-// instal;
-const express = require('express');
+// First run:
+// npm init --yes
+// npm install express
+
+// make sure to add a .gitignore for .env and node modules
+
+// require express returns a function
+const express = require("express");
+// returns an object
 const app = express();
-// import env variables
-require('dotenv').config();
 
+// for env variables
+// run npm install dotenv for dependency
+require("dotenv").config();
 
+// to parse JSON in req, res
 app.use(express.json());
 
-// fake database 
+// fake database
 const tweets = [
-    { id: 1, user: 'Alice', tweet: 'Hello World!' },
-    { id: 2, user: 'Bob', tweet: 'My second tweet' },
+  { id: 1, user: "Zara", tweet: "Hello" },
+  { id: 2, user: "Emerald", tweet: "World" },
 ];
 
-// Middleware to validate tweet input
+// Middleware to validate tweet length
+// const validateTweetLength = (req, res, next) => {
+//     const tweet = req.body.tweet;
+//     if (tweet.length <= 100) {
+//       next(); // Tweet is valid, proceed to the next middleware or route
+//     } else {
+//       res.status(400).json({ error: 'Tweet is too long (max 100 characters).' });
+//     }
+//   };
+
+// Middleware to validate input of post request
 const validateInput = (req, res, next) => {
-    const { user, tweet } = req.body;
-    if (!user || !tweet) {
-        res.status(400).json({ error: "User and tweet content are required" });
-    }
-    else{
-        next();
-    }
+  const user = req.body.user;
+  const tweet = req.body.tweet;
+  if (!tweet || !user) {
+    res.status(400).json({ error: "Incomplete input" });
+  } else {
+    next();
+  }
+};
 
- }
-
-app.post("/api/tweets", validateInput, (req, res) => {
-    const newTweet = {
-        id: tweets.length + 1,
-        user: req.body.user,
-        tweet: req.body.tweet
-    };
-    tweets.push(newTweet);
-    res.send(newTweet);
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
-// GET /tweets - Retrieve all tweets
+// get all tweets
+app.get("/api/tweets", (req, res) => {
+  res.send(tweets);
+});
+
+// get tweets by user (param in route)
 app.get("/api/tweets/:user", (req, res) => {
-    let target = tweets.find(t => t.user === req.params.user);
-    if (!target) {
-        res.status(404).json({ error: "Tweet not found" });
-    }
-    else {
-        res.send(target);
-    }
-    res.send(tweets);
+  var target = tweets.find((t) => t.user === req.params.user);
+  if (!target) {
+    res.status(404).send("Tweet not found");
+  } else {
+    res.send(target);
+  }
 });
 
-app.post("/api/tweets", (req, res) => {
-    const newTweet = {
-        id: tweets.length + 1,
-        user: req.body.user,
-        tweet: req.body.tweet
-    };
-    tweets.push(newTweet);
-    res.send(newTweet);
-}
-);
+// alternate get request for tweets where user is query param
+// example call: http://localhost:4000/api/tweets?user=Zara
+// app.get('/api/tweets', (req, res) => {
+//     const user = req.query.user
+//     console.log(user)
+//     if (user) {
+//         var target = tweets.find(t => t.user === user)
+//         if (!target) {
+//             res.status(404).send("Tweet not found")
+//         } else {
+//             res.send(target)
+//         }
+//     } else {
+//         res.send(tweets)
+//     }
+// })
 
-app.delete("/api/tweets/:id", (req, res) => {
-    const tweetId = parseInt(req.params.id);
-    const tweetIndex = tweets.findIndex(t => t.id === tweetId);
-    if (tweetIndex === -1) {
-        res.status(404).json({ error: "Tweet not found" });
-    } else {
-        const deletedTweet = tweets.splice(tweetIndex, 1);
-        res.send(deletedTweet);
-    }
+// post a tweet
+app.post("/api/tweets", validateInput, (req, res) => {
+  var tweet = {
+    id: tweets.length + 1,
+    user: req.body.user,
+    tweet: req.body.tweet,
+  };
+  tweets.push(tweet);
+  res.send(tweet);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { 
-    console.log(`Server is running on port ${PORT}`);
+// delete a tweet
+app.delete("/api/tweets", (req, res) => {
+  const tweetIndex = tweets.findIndex((tweet) => tweet.id === req.body.id);
+  if (tweetIndex === -1) {
+    res.status(404).send("Tweet not found");
+  } else {
+    // Remove the tweet from the 'tweets' array
+    var removed = tweets[tweetIndex];
+    console.log(removed);
+    tweets.splice(tweetIndex, 1);
+    res.json(removed);
+  }
 });
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on port ${port}`));
