@@ -86,3 +86,5 @@ You should pull approximately every week when new content arrives. These steps w
     ```
     git merge upstream/main
     ```
+git fetch upstream
+git merge -X ours upstream/main
