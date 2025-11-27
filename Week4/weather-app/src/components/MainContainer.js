@@ -49,7 +49,7 @@ function MainContainer(props) {
   After fetching the data, use the 'setWeather' function from the 'useState' hook to set the weather data 
   in your state.
   */
- // useEffect to fetch weather data when selectedCity changes
+  // useEffect to fetch weather data when selectedCity changes
   useEffect(() => {
     if (!selectedCity || !selectedCity.lat || !selectedCity.lon) {
       setWeatherRaw(null);
@@ -164,8 +164,10 @@ function MainContainer(props) {
   return (
     <div id="main-container">
       <div id="weather-container">
-        <h1>Weather App</h1>
-
+        <div className="header-section">
+          <h1 className="main-title">Amazing amazing weather App</h1>
+          {!selectedCity && <h3>You should enter in a city! </h3>}
+        </div>
         {selectedCity && loading && <p>Loading weather...</p>}
         {selectedCity && error && <p className="error">Error: {error}</p>}
 
@@ -197,13 +199,14 @@ function MainContainer(props) {
             <div id="five-day-forecast" aria-label="5 day forecast">
               {weatherProcessed.fiveDay.map((d) => (
                 <div className="forecast-day" key={d.date}>
+                  <h4 className="forecast-day-title">{d.label}</h4>
+
                   <img
                     className="forecast-icon"
                     src={d.icon ? `/icons/${d.icon}.svg` : ""}
                     alt={d.desc || "icon"}
                   />
                   <div className="forecast-day-content">
-                    <h4 className="forecast-day-title">{d.label}</h4>
                     <p className="forecast-day-temps">{kToF(d.minK)}°F - {kToF(d.maxK)}°F</p>
                     <p className="forecast-day-desc">{d.desc}</p>
                   </div>
