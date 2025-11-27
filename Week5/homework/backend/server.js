@@ -6,12 +6,25 @@ const admin = require("firebase-admin");
 //const creds = require("./cred.json"); // Path to your service account JSON
 
  
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',  // Local development
+    'https://full-stack-curriculum-2025-aklj.vercel.app',  // Your frontend URL
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 
 
 //middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json()); // Parse JSON body
 // Firebase Admin Authentication Middleware
+
+ 
+
+
+
 const auth = (req, res, next) => {
   try {
     const tokenId = req.get("Authorization").split("Bearer ")[1];

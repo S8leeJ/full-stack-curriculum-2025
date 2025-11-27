@@ -9,22 +9,35 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   // The `palette` object allows us to define colors for our app. 
   // MUI components will use these colors by default, ensuring a consistent look.
-  
+
   palette: {
     // The `primary` color is used by default by many MUI components.
     // For instance, a button will use the primary color as its background unless we specify otherwise.
     primary: {
       main: "#BF5700", // UT's Burnt Orange. This color will be used for primary elements. 
-                       // Experiment by changing it and observe how various components in the 
-                       // app adopt this color!
+      // Experiment by changing it and observe how various components in the 
+      // app adopt this color!
     },
-    
     // The `secondary` color is like the primary color but is used less frequently. 
     // It's useful for things you want to stand out but not dominate the page.
     secondary: {
       main: "#FF8787", // A light red. It might be used for alerts or secondary buttons, for instance.
     },
+    background: { default: "#fcecd4ff" },
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          backgroundColor: "#fcecd4ff",
+          backgroundImage: "linear-gradient(180deg,#ffffffff 40%,#BF5700 160%)",
+          minHeight: "100vh",
+          margin: 0
+        }
+      }
+
+    }
+  }
 });
 
 // We export the theme so we can use it in other parts of our app, particularly in App.js 
