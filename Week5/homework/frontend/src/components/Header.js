@@ -8,7 +8,7 @@ function Header() {
   return (
     <AppBar
       position="static"
-      color="default"
+      color="main"
       elevation={0}
       sx={{
         paddingY: 1,
