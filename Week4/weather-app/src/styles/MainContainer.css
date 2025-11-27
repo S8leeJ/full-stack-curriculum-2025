@@ -19,7 +19,7 @@ img[src] {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-   background: #87b7ff;
+  background: #87b7ff;
   background: linear-gradient(180deg, #a8d0ff 0%, #5695f3 60%, #2b6ed1 100%);
 }
 
@@ -34,30 +34,35 @@ img[src] {
 #five-day-forecast {
   color: black;
   display: flex;
-  flex-wrap: wrap;            /* allow cards to wrap to the next row */
+  flex-wrap: wrap;
+  /* allow cards to wrap to the next row */
   justify-content: space-evenly;
   align-items: center;
   width: 100%;
   gap: 12px;
-  
 }
 
 .forecast-day {
-  flex: 1 1 160px;            /* allow shrinking, grow, and prefer ~160px width */
-  min-width: 0;               /* allow content to shrink below its intrinsic size */
+  flex: 1 1 160px;
+  /* allow shrinking, grow, and prefer ~160px width */
+  min-width: 0;
+  /* allow content to shrink below its intrinsic size */
   text-align: center;
+  font-size: 1.2rem;
   background-color: #1d64cf89;
   border-radius: 8px;
   padding: 12px;
+  margin-top: 12px;
   box-sizing: border-box;
-  
+
 }
 
- 
+
 .forecast-day-content {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin-bottom: 8px;
 }
 
 
@@ -67,18 +72,18 @@ img[src] {
 }
 
 .forecast-day-desc {
-  color: #06111c;
-  font-size: 0.75rem;
+  color: #000000;
+  font-size: 1rem;
 }
 
 /* Today's weather styles */
 #today-weather {
   width: 100%;
-  background:  #5695f3;
+  background: #5695f3;
   border-radius: 8px;
   padding: 12px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   margin-top: 3%;
 }
 
@@ -101,7 +106,35 @@ img[src] {
 }
 
 .today-desc {
-  color: #33475b;
+  color: #000000;
 }
 
 
+.main-title {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 12px 0;
+  color: #0c036d;
+  font-size: 2.5rem;
+  background-color: transparent;
+}
+
+.header-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* stack title + subtitle vertically */
+  justify-content: center;
+  /* vertical centering inside the wrapper */
+  align-items: center;
+  /* horizontal centering */
+  text-align: center;
+  /* center text fallback */
+  padding: 12px 0;
+  box-sizing: border-box;
+  gap: 6px;
+
+}

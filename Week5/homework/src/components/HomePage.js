@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -10,11 +10,14 @@ import {
   Checkbox,
   Box,
   Grid,
+  IconButton,
 } from "@mui/material";
 import Header from "./Header";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useEffect } from "react";
+import DeleteIcon from '@mui/icons-material/Delete';
+
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 export default function HomePage() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -34,17 +37,16 @@ export default function HomePage() {
   useEffect(() => {
     if (!currentUser) {
       navigate('/login');
+      return;
     }
-    else {
-      fetch(`https://tpeo-todo.vercel.app/tasks/${currentUser}`)
-        .then(response => response.json())
-        .then((data) => {
-          setTaskList(data);
-        })
-        .catch((error) => {
-          console.error('Error fetching tasks:', error);
-        });
-    }
+
+    fetch(`${API_BASE}/tasks/${encodeURIComponent(currentUser)}`)
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((data) => setTaskList(Array.isArray(data) ? data : []))
+      .catch((err) => console.error('Error fetching tasks:', err));
   }, [currentUser, navigate]);
 
 
@@ -56,25 +58,20 @@ export default function HomePage() {
       // In addition to updating the state directly, you should send a request
       // to the API to add a new task and then update the state based on the response.
 
-      fetch(`https://tpeo-todo.vercel.app/tasks`, {
+      fetch(`${API_BASE}/tasks`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          user: currentUser,
-          name: newTaskName,
-          finished: false,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: currentUser, name: newTaskName, finished: false }),
       })
-        .then(response => response.json())
-        .then((data) => {
-          setTaskList([...taskList, data]);
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((created) => {
+          setTaskList((prev) => [...prev, created]);
           setNewTaskName("");
         })
-        .catch((error) => {
-          console.error('Error adding task:', error);
-        });
+        .catch((err) => console.error('Error adding task:', err));
     } else if (taskList.some((task) => task.name === newTaskName)) {
       alert("Task already exists!");
     }
@@ -82,22 +79,30 @@ export default function HomePage() {
 
   // Function to toggle the 'finished' status of a task.
   function toggleTaskCompletion(task) {
-
-    fetch(`https://tpeo-todo.vercel.app/tasks/${task.id}`, {
-      method: 'DELETE',
+    const next = !task.finished;
+    fetch(`${API_BASE}/tasks/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ finished: next }),
     })
-      .then(response => response.json())
-      .then(() => {
-        const updateTasklist = taskList.filter((t) => t.id !== task.id);
-        setTaskList(updateTasklist);
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
       })
-      .catch((error) => {
-        console.error('Error deleting task:', error);
-      });
+      .then(() => {
+        setTaskList((prev) => prev.map((t) => (t.id === task.id ? { ...t, finished: next } : t)));
+      })
+      .catch((err) => console.error('Error updating task:', err));
+  }
 
-    // TODO: Support removing/checking off todo items in your todo list through the API.
-    // Similar to adding tasks, when checking off a task, you should send a request
-    // to the API to update the task's status and then update the state based on the response.
+  function deleteTask(id) {
+    fetch(`${API_BASE}/tasks/${id}`, { method: 'DELETE' })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(() => setTaskList((prev) => prev.filter((t) => t.id !== id)))
+      .catch((err) => console.error('Error deleting task:', err));
   }
 
   // Function to compute a message indicating how many tasks are unfinished.
@@ -166,15 +171,28 @@ export default function HomePage() {
             {/* List of tasks */}
             <List sx={{ marginTop: 3 }}>
               {taskList.map((task) => (
-                <ListItem
-                  key={task.name}
-                  dense
-                  onClick={() => toggleTaskCompletion(task)}
-                >
+                <ListItem key={task.id} dense>
                   <Checkbox
                     checked={task.finished}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTaskCompletion(task);
+                    }}
                   />
-                  <ListItemText primary={task.name} />
+                  <ListItemText
+                    primary={task.name}
+                    sx={{ textDecoration: task.finished ? 'line-through' : 'none' }}
+                  />
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteTask(task.id);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
                 </ListItem>
               ))}
             </List>
