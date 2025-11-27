@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE = process.env.REACT_APP_BACKEND || 'http://localhost:3001';
 export default function HomePage() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
@@ -33,6 +33,14 @@ export default function HomePage() {
   // TODO: Support retrieving your todo list from the API.
   // Currently, the tasks are hardcoded. You'll need to make an API call
   // to fetch the list of tasks instead of using the hardcoded data.
+  const getAuthHeaders = async () => {
+    if (!currentUser) return {};
+    const token = await currentUser.getIdToken();
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  };
 
   useEffect(() => {
     if (!currentUser) {
@@ -40,69 +48,78 @@ export default function HomePage() {
       return;
     }
 
-    fetch(`${API_BASE}/tasks/${encodeURIComponent(currentUser)}`)
-      .then((response) => {
+    // UPDATED: Add auth header
+    const fetchTasks = async () => {
+      try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(
+          `${API_BASE}/tasks/${encodeURIComponent(currentUser.email)}`, // Use email instead of currentUser
+          { headers }
+        );
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
-      })
-      .then((data) => setTaskList(Array.isArray(data) ? data : []))
-      .catch((err) => console.error('Error fetching tasks:', err));
+        const data = await response.json();
+        setTaskList(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Error fetching tasks:', err);
+      }
+    };
+
+    fetchTasks();
   }, [currentUser, navigate]);
 
 
-  function handleAddTask() {
-    // Check if task name is provided and if it doesn't already exist.
+  async function handleAddTask() {
     if (newTaskName && !taskList.some((task) => task.name === newTaskName)) {
-
-      // TODO: Support adding todo items to your todo list through the API.
-      // In addition to updating the state directly, you should send a request
-      // to the API to add a new task and then update the state based on the response.
-
-      fetch(`${API_BASE}/tasks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user: currentUser, name: newTaskName, finished: false }),
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then((created) => {
-          setTaskList((prev) => [...prev, created]);
-          setNewTaskName("");
-        })
-        .catch((err) => console.error('Error adding task:', err));
+      try {
+        const headers = await getAuthHeaders();
+        const res = await fetch(`${API_BASE}/tasks`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            user: currentUser.email,  // Use email
+            name: newTaskName,
+            finished: false
+          }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const created = await res.json();
+        setTaskList((prev) => [...prev, created]);
+        setNewTaskName("");
+      } catch (err) {
+        console.error('Error adding task:', err);
+      }
     } else if (taskList.some((task) => task.name === newTaskName)) {
       alert("Task already exists!");
     }
   }
 
-  // Function to toggle the 'finished' status of a task.
-  function toggleTaskCompletion(task) {
+  async function toggleTaskCompletion(task) {
     const next = !task.finished;
-    fetch(`${API_BASE}/tasks/${task.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ finished: next }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(() => {
-        setTaskList((prev) => prev.map((t) => (t.id === task.id ? { ...t, finished: next } : t)));
-      })
-      .catch((err) => console.error('Error updating task:', err));
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE}/tasks/${task.id}`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ finished: next }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setTaskList((prev) => prev.map((t) => (t.id === task.id ? { ...t, finished: next } : t)));
+    } catch (err) {
+      console.error('Error updating task:', err);
+    }
   }
-
-  function deleteTask(id) {
-    fetch(`${API_BASE}/tasks/${id}`, { method: 'DELETE' })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then(() => setTaskList((prev) => prev.filter((t) => t.id !== id)))
-      .catch((err) => console.error('Error deleting task:', err));
+  async function deleteTask(id) {
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE}/tasks/${id}`, {
+        method: 'DELETE',
+        headers
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setTaskList((prev) => prev.filter((t) => t.id !== id));
+    } catch (err) {
+      console.error('Error deleting task:', err);
+    }
   }
 
   // Function to compute a message indicating how many tasks are unfinished.

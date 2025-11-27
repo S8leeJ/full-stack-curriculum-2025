@@ -7,25 +7,16 @@ import {
   Box,
   Alert,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import { useAuth } from "../contexts/AuthContext";
-import { Link } from "react-router-dom";  
+import { Link } from "react-router-dom";
 
-function LoginPage() {
-  // Access the MUI theme for potential theme-related functionalities.
-  const theme = useTheme();
-
-  // TODO: Extract login function and error from our authentication context.
-  const {loginError, login} = useAuth();
-
-  // State to hold the email and password entered by the user.
+function RegisterPage() {
+  const { loginError, register } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // TODO: Handle login function.
-  const handleLogin = () => {
-    login(email, password);
-
+  const handleRegister = () => {
+    register(email, password);
   };
 
   return (
@@ -49,7 +40,7 @@ function LoginPage() {
           src="/longhorn.jpg"
         ></Box>
         <Typography component="h1" variant="h4" fontWeight="bold">
-          Login
+          Register
         </Typography>
         <Box sx={{ mt: 1 }}>
           <TextField
@@ -59,8 +50,9 @@ function LoginPage() {
             fullWidth
             id="email"
             label="Email"
+            type="email"
             InputLabelProps={{ shrink: true }}
-            placeholder="admin@example.com"
+            placeholder="user@example.com"
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -84,25 +76,24 @@ function LoginPage() {
             variant="contained"
             color="primary"
             sx={{ mt: 3, mb: 2 }}
-            onClick={handleLogin}
+            onClick={handleRegister}
           >
-            Login
+            Register
           </Button>
-          {/* NEW: Add link to registration page */}
+          
           <Typography variant="body2" align="center" sx={{ mt: 2 }}>
-            Don't have an account? <Link to="/register">Register here</Link>
+            Already have an account? <Link to="/login">Login here</Link>
           </Typography>
-     
         </Box>
-        {/* TODO: Display Login Error if it exists */}
-        {loginError && (<Alert
-          severity="error"
-        >
-          {loginError}
-        </Alert>)}
+        
+        {loginError && (
+          <Alert severity="error">
+            {loginError}
+          </Alert>
+        )}
       </Box>
     </Container>
   );
 }
 
-export default LoginPage;
+export default RegisterPage;
