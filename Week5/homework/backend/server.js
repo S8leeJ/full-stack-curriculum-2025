@@ -26,6 +26,19 @@ const auth = (req, res, next) => {
   }
 };
 
+
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "Todo API is running!", 
+    endpoints: [
+      "GET /tasks/:user",
+      "POST /tasks",
+      "PATCH /tasks/:id",
+      "DELETE /tasks/:id"
+    ]
+  });
+});
+
 // getting user tasks
 app.get("/tasks/:user", auth, async (req, res) => {
   const { user } = req.params;
