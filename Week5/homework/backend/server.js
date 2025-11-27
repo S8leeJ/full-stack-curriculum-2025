@@ -3,7 +3,10 @@ const cors = require("cors");
 const db = require("./firebase"); // Import Firestore instance
 const app = express();
 const admin = require("firebase-admin");
-const creds = require("./cred.json"); // Path to your service account JSON
+//const creds = require("./cred.json"); // Path to your service account JSON
+
+ 
+
 
 //middleware
 app.use(cors());
