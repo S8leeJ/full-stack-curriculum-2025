@@ -7,7 +7,7 @@ import HomePage from "./components/HomePage"; // Component for the homepage
 import LoginPage from "./components/LoginPage"; // Component for the login page
 import { CssBaseline } from "@mui/material"; // For consistent baseline styling
 import theme from "./Theme"; // Custom theme settings
-
+import RegisterPage from "./components/RegisterPage"; // Component for the registration page
 // The main App component
 function App() {
   return (
@@ -25,6 +25,7 @@ function App() {
             {/* The path prop determines the URL path, and the element prop determines which component to show. */}
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
           </Routes>
         </ThemeProvider>
       </AuthProvider>
