@@ -3,11 +3,7 @@ import "../styles/MainContainer.css"; // Import the CSS file for MainContainer
 
 function MainContainer(props) {
   const { apiKey, selectedCity } = props;
-
-  const [weatherRaw, setWeatherRaw] = useState(null);
-  const [weatherProcessed, setWeatherProcessed] = useState(null); // { today: {...}, fiveDay: [...] }
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [weatherProcessed, setWeatherProcessed] = useState(null);
 
   function formatDate(daysFromNow = 0) {
     let output = "";
@@ -18,60 +14,22 @@ function MainContainer(props) {
     return output;
   }
 
-  /*
-  STEP 1: IMPORTANT NOTICE!
-
-  Before you start, ensure that both App.js and SideContainer.js are complete. The reason is MainContainer 
-  is dependent on the city selected in SideContainer and managed in App.js. You need the data to flow from 
-  App.js to MainContainer for the selected city before making an API call to fetch weather data.
-  */
-
-  /*
-  STEP 2: Manage Weather Data with State.
-  
-  Just like how we managed city data in App.js, we need a mechanism to manage the weather data 
-  for the selected city in this component. Use the 'useState' hook to create a state variable 
-  (e.g., 'weather') and its corresponding setter function (e.g., 'setWeather'). The initial state can be 
-  null or an empty object.
-  */
-
-
-  /*
-  STEP 3: Fetch Weather Data When City Changes.
-  
-  Whenever the selected city (passed as a prop) changes, you should make an API call to fetch the 
-  new weather data. For this, use the 'useEffect' hook.
-
-  The 'useEffect' hook lets you perform side effects (like fetching data) in functional components. 
-  Set the dependency array of the 'useEffect' to watch for changes in the city prop. When it changes, 
-  make the API call.
-
-  After fetching the data, use the 'setWeather' function from the 'useState' hook to set the weather data 
-  in your state.
-  */
-  // useEffect to fetch weather data when selectedCity changes
+  // clears the states and stops running if no city is there
   useEffect(() => {
     if (!selectedCity || !selectedCity.lat || !selectedCity.lon) {
-      setWeatherRaw(null);
       setWeatherProcessed(null);
       return;
     }
 
-    // AbortController to cancel fetch if component unmounts or city changes
-    const controller = new AbortController();
-
     async function fetchForecast() {
-      setLoading(true);
-      setError(null);
       try {
+        // actuall get the data
         const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${selectedCity.lat}&lon=${selectedCity.lon}&appid=${apiKey}`;
-        const resp = await fetch(url, { signal: controller.signal });
+        const resp = await fetch(url);
         if (!resp.ok) throw new Error(`API error ${resp.status}`);
         const data = await resp.json();
-        // set raw data
-        setWeatherRaw(data);
 
-        // group by date (YYYY-MM-DD)
+        // group by date 
         const grouped = {};
         (data.list || []).forEach(entry => {
           const date = entry.dt_txt.split(" ")[0];
@@ -79,41 +37,34 @@ function MainContainer(props) {
           grouped[date].push(entry);
         });
 
-        const dates = Object.keys(grouped).slice(0, 6); // include today + next 5, slice if needed
+        const dates = Object.keys(grouped).slice(0, 6); // get just the next 6
         const todayDate = dates[0];
 
-        // build today's representative entry
+        // for todays info
         const todayEntries = grouped[todayDate] || [];
         const todayPick = pickRepresentative(todayEntries) || data.list?.[0] || null;
 
-        // build five day (next up to 5 unique calendar days; exclude today if you want tomorrow-first)
-        const fiveDates = dates.slice(0, 5); // change to slice(1,6) to skip today
-        const fiveDay = fiveDates.map(date => {
+        // build five day  
+        const fiveDay = dates.slice(0, 5).map((date, index) => {
           const entries = grouped[date] || [];
-          // compute min/max using entry.main.temp_min / temp_max when present, otherwise temp
           let minK = Infinity;
           let maxK = -Infinity;
-          // find min/max temps for each days subsets 
+          // find min/max temps 
           entries.forEach(e => {
-            // use main.temp_min / temp_max if present, otherwise use main.temp
             const minVal = e.main?.temp_min ?? e.main?.temp;
             const maxVal = e.main?.temp_max ?? e.main?.temp;
             // update minK / maxK accordingly
             if (typeof minVal === "number" && minVal < minK) minK = minVal;
             if (typeof maxVal === "number" && maxVal > maxK) maxK = maxVal;
           });
-          // fallback if min/max not found set to first entry temp
-          if (!isFinite(minK) && entries[0]) minK = entries[0].main?.temp;
-          if (!isFinite(maxK) && entries[0]) maxK = entries[0].main?.temp;
-
           // pick representative entry for icon/desc
           const rep = pickRepresentative(entries) || entries[0] || null;
           const icon = rep?.weather?.[0]?.icon ?? "";
           const desc = rep?.weather?.[0]?.description ?? "";
-          // return processed day entry with date, label, minK, maxK, icon, desc
+          // return day entry 
           return {
             date,
-            label: new Date(date).toLocaleString("en-US", { weekday: "long" }).toUpperCase(),
+            label: formatDate(index),
             minK,
             maxK,
             icon,
@@ -133,34 +84,26 @@ function MainContainer(props) {
           fiveDay
         });
       } catch (err) {
-        if (err.name !== "AbortError") {
-          setError(err.message || "Failed to fetch");
-        }
-      } finally {
-        setLoading(false);
+        console.error("Error fetching weather data:", err);
       }
     }
 
     // initiate fetch
     fetchForecast();
-    return () => controller.abort();
   }, [selectedCity, apiKey]);
+
   function kToF(k) {
     return Math.round((k - 273.15) * 9 / 5 + 32);
   }
-  // pick representative entry from a day's entries (daytime if possible, else any daytime, else any entry)
+  
+  // pick representative entry from a day's entries for daytime
   function pickRepresentative(entries) {
     if (!entries || entries.length === 0) return null;
     return (
-      entries.find(e => e.dt_txt.includes("12:00:00") && e.weather?.[0]?.icon?.endsWith("d")) ||
-      entries.find(e => e.weather?.[0]?.icon?.endsWith("d")) ||
-      entries.find(e => e.dt_txt.includes("12:00:00")) ||
-      entries[0]
+      entries.find(e => e.weather?.[0]?.icon?.endsWith("d"))
     );
   }
 
-
-  // Render
   return (
     <div id="main-container">
       <div id="weather-container">
@@ -168,12 +111,9 @@ function MainContainer(props) {
           <h1 className="main-title">Amazing amazing weather App</h1>
           {!selectedCity && <h3>You should enter in a city! </h3>}
         </div>
-        {selectedCity && loading && <p>Loading weather...</p>}
-        {selectedCity && error && <p className="error">Error: {error}</p>}
-
-        {selectedCity && !loading && !error && weatherProcessed && (
+        {selectedCity && weatherProcessed && (
           <>
-            {/* Today block */}
+            {/* the section for today block */}
             <div id="today-weather">
               <div className="today-wrapper">
                 {weatherProcessed.today && (
@@ -181,7 +121,6 @@ function MainContainer(props) {
                     <img
                       className="today-icon"
                       src={weatherProcessed.today.icon ? `/icons/${weatherProcessed.today.icon}.svg` : ""}
-                      alt={weatherProcessed.today.desc || "weather icon"}
                     />
                     <div className="today-info">
                       <h2 id="today-city">{selectedCity.fullName || selectedCity.name || "Today"}</h2>
@@ -195,16 +134,14 @@ function MainContainer(props) {
               </div>
             </div>
 
-            {/* Five-day */}
+            {/* the five-day block */}
             <div id="five-day-forecast" aria-label="5 day forecast">
               {weatherProcessed.fiveDay.map((d) => (
                 <div className="forecast-day" key={d.date}>
                   <h4 className="forecast-day-title">{d.label}</h4>
-
                   <img
                     className="forecast-icon"
                     src={d.icon ? `/icons/${d.icon}.svg` : ""}
-                    alt={d.desc || "icon"}
                   />
                   <div className="forecast-day-content">
                     <p className="forecast-day-temps">{kToF(d.minK)}°F - {kToF(d.maxK)}°F</p>
