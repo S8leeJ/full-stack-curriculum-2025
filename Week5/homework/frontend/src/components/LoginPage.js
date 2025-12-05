@@ -88,7 +88,7 @@ function LoginPage() {
           >
             Login
           </Button>
-          {/* NEW: Add link to registration page */}
+          {/* link to registration page */}
           <Typography variant="body2" align="center" sx={{ mt: 2 }}>
             Don't have an account? <Link to="/register">Register here</Link>
           </Typography>
